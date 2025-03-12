@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+       body {
+            background-color: #f4f4f4;
+            color: #333;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+		.navbar {
+            width: 100%;
+            background: #007BFF;
+            padding: 10px;
+            display: flex;
+            justify-content: flex-end;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 8px 16px; /* Adjusted padding to fit smaller navbar */
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.3s, transform 0.2s;
+            margin-right: 20px;
+        }
+		.navbar a:hover {
+           background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }		
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            position: relative;
+        }
+        h2 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: red;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+	 <div class="navbar">
+        <a href="index.html">Save details?</a>
+    </div>					
+    <div class="container">
+	 <div id="notification" class="notification"></div>
+        <h2>Interest Calculator</h2>
+        <label>Enter Starting Date:</label>
+        <input type="date" id="myDate1" onchange="updateDuration()">
+
+        <label>Enter Ending Date:</label>
+        <input type="date" id="myDate2" onchange="updateDuration()">
+
+        <label>Enter Amount:</label>
+        <input type="number" id="amount" placeholder="100000">
+
+        <label>Enter Interest Rate (per 100):</label>
+        <input type="number" step="any" id="interest" placeholder="1.5">
+
+        <h3 id="durationBtn" disabled>Duration: 0 years, 0 months, 0 days</h3>
+        <button onclick="calculateInterest()">Calculate</button>
+		<h3 id="output"></h3>
+		<button onclick="resetForm()" style="background:#dc3545">Reset</button>
+    </div>
+    
+    <script>
+	   function showNotification(message) {
+            let notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.display = "block";
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 3000);
+        }
+        function updateDuration() {
+            let startDate = new Date(document.getElementById("myDate1").value);
+            let endDate = new Date(document.getElementById("myDate2").value);
+            
+            if (isNaN(startDate) || isNaN(endDate) || endDate <= startDate) {
+                document.getElementById("durationBtn").innerText = "Duration: Enter dates properly";
+                return;
+            }
+            
+            let day1 = startDate.getDate();
+            let mon1 = startDate.getMonth() + 1;
+            let year1 = startDate.getFullYear();
+
+            let day2 = endDate.getDate();
+            let mon2 = endDate.getMonth() + 1;
+            let year2 = endDate.getFullYear();
+
+            if (day2 < day1) {
+                day2 += 30;
+                mon2 -= 1;
+            }
+            if (mon2 < mon1) {
+                mon2 += 12;
+                year2 -= 1;
+            }
+
+            let day_diff = day2 - day1;
+            let mon_diff = mon2 - mon1;
+            let year_diff = year2 - year1;
+
+            document.getElementById("durationBtn").innerText = `Duration: ${year_diff} years, ${mon_diff} months, ${day_diff} days`;
+        }
+
+        function calculateInterest() {
+            let startDate = new Date(document.getElementById("myDate1").value);
+            let endDate = new Date(document.getElementById("myDate2").value);
+            let amount = parseFloat(document.getElementById("amount").value);
+            let interestRate = parseFloat(document.getElementById("interest").value);
+			if (isNaN(startDate) || isNaN(endDate) || endDate <= startDate) {
+                showNotification("Enter dates properly");
+                return;
+            }
+			if (isNaN(amount) || isNaN(interestRate)) {
+                showNotification("Enter amount and interest properly");
+                return;
+            }
+			if (endDate <= startDate) {
+                document.getElementById("output").innerHTML = "<b style='color: red;'>Ending date must be greater than starting date!</b>";
+                return;
+            }
+            let day1 = startDate.getDate();
+            let mon1 = startDate.getMonth() + 1;
+            let year1 = startDate.getFullYear();
+
+            let day2 = endDate.getDate();
+            let mon2 = endDate.getMonth() + 1;
+            let year2 = endDate.getFullYear();
+
+            if (day2 < day1) {
+                day2 += 30;
+                mon2 -= 1;
+            }
+            if (mon2 < mon1) {
+                mon2 += 12;
+                year2 -= 1;
+            }
+
+            let day_diff = day2 - day1;
+            let mon_diff = mon2 - mon1;
+            let year_diff = year2 - year1;
+
+            let whole_years = (year_diff > 0) ? (amount * Math.pow(1 + (interestRate * 12 / 100), year_diff)) - amount : 0;
+            let n_minus_1_yrs = (year_diff > 0) ? (amount * Math.pow(1 + (interestRate * 12 / 100), (year_diff - 1))) - amount : 0;
+            
+            let less_3_months = 0;
+            if (year_diff > 0) {
+                if (mon_diff > 3) {
+                    less_3_months = ((amount + n_minus_1_yrs) * (1 + (interestRate * 12 / 100))) - amount - n_minus_1_yrs;
+                } else {
+                    less_3_months = ((amount + n_minus_1_yrs) * (1 + (interestRate * (12 + mon_diff) / 100))) - amount - n_minus_1_yrs;
+                }
+            }
+            
+            let days_interest_less3_months = (mon_diff < 3) ? ((less_3_months / (12 + mon_diff)) / 30) * day_diff : 0;
+            let less3_monthsAndDays = (mon_diff < 3) ? n_minus_1_yrs + less_3_months + days_interest_less3_months + amount : 0;
+            let amountWithOnlyYearsInterest = amount + whole_years;
+            let monthsInterest = (mon_diff > 0) ? (amountWithOnlyYearsInterest / 100) * interestRate * mon_diff : 0;
+            let monthsYearsInterest = amountWithOnlyYearsInterest + monthsInterest;
+            
+            let perDayInterest = (mon_diff > 0) ? monthsInterest / (mon_diff * 30) : ((amountWithOnlyYearsInterest * interestRate / 100) / 30);
+            let daysInterest = perDayInterest * day_diff;
+            let totalAmountGT3 = monthsYearsInterest + daysInterest;
+            let totalAmountLT3 = (mon_diff < 3) ? ((year_diff == 0) ? totalAmountGT3 : less3_monthsAndDays) : totalAmountGT3;
+            
+            document.getElementById("output").innerHTML =
+                `Total Amount : <b>Rs. ${totalAmountLT3.toFixed(2)}</b><br>
+                 Total Interest Earned: <b>Rs. ${(totalAmountLT3 - amount).toFixed(2)}</b>`;
+        }
+		function resetForm() {
+            document.getElementById("myDate1").value = "";
+            document.getElementById("myDate2").value = "";
+            document.getElementById("amount").value = "";
+            document.getElementById("interest").value = "";
+            document.getElementById("durationBtn").innerText = "Duration: 0 years, 0 months, 0 days";
+            document.getElementById("output").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
